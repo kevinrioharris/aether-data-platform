@@ -1,0 +1,26 @@
+# Every non-CDC source, declared in one place. Connectors read their settings from here.
+# (The Postgres CDC source is configured in infra/debezium/shop-connector.json.)
+
+sources:
+  sales_targets:
+    type: excel
+    description: Monthly revenue targets per product category (USD), maintained by Sales Ops
+    owner: sales-ops
+    landing_prefix: excel/sales_targets/        # s3://landing/<prefix>
+    file_pattern: 'sales_targets_(?P<fiscal_year>\d{4})\.xlsx$'
+    sheet: Targets
+    header_row_contains: Category               # header row = first row whose cells include this
+    stop_at_first_cell: Total                   # summary rows start here
+    ignore_columns: [FY Total]                  # formula column, recomputed downstream
+    category_aliases:                           # spreadsheet label → product DB category
+      Home & Living: Home
+
+  fx_rates:
+    type: rest_api
+    description: Daily ECB reference FX rates via frankfurter.dev (units of currency per 1 USD)
+    owner: finance
+    url: https://api.frankfurter.dev/v1/{start}..{end}
+    params:
+      base: USD
+      symbols: EUR,GBP,IDR,SGD
+    lookback_days: 120                          # each run re-fetches this window (rates can be revised)

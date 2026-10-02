@@ -1,0 +1,28 @@
+{
+  "name": "shop-postgres-cdc",
+  "config": {
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+    "plugin.name": "pgoutput",
+    "database.hostname": "postgres-source",
+    "database.port": "5432",
+    "database.user": "${SHOP_DB_USER}",
+    "database.password": "${SHOP_DB_PASSWORD}",
+    "database.dbname": "${SHOP_DB_NAME}",
+    "topic.prefix": "shop",
+    "schema.include.list": "public",
+    "table.include.list": "public.customers,public.products,public.orders,public.order_items,public.debezium_signal",
+    "publication.name": "dbz_shop_publication",
+    "publication.autocreate.mode": "disabled",
+    "slot.name": "dbz_shop_slot",
+    "snapshot.mode": "initial",
+    "signal.data.collection": "public.debezium_signal",
+    "decimal.handling.mode": "string",
+    "time.precision.mode": "connect",
+    "tombstones.on.delete": "false",
+    "heartbeat.interval.ms": "10000",
+    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "key.converter.schemas.enable": "false",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter.schemas.enable": "false"
+  }
+}
